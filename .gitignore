@@ -210,3 +210,4 @@ screenshots/
 test_results/
 evaluation_results/
 docker/data/
+.DS_Store
