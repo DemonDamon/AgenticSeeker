@@ -50,7 +50,7 @@ docker --version
 docker-compose --version
 
 # 进入 docker 目录
-cd /Users/damon/myWork/AgenticX/examples/agenticx-for-ecloudcup/agenticx-for-ecloudcup/agenticseeker/docker
+cd docker
 ```
 
 ### 2. 配置环境变量

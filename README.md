@@ -2,8 +2,6 @@
 
 AgenticSeeker 是一个先进的多智能体系统，构建于 `agenticx` (v0.2.1) 框架之上。它旨在通过自然语言指令，实现对Android设备GUI的复杂操作自动化。系统集成了强大的多模态能力、知识管理和强化学习机制，使其能够持续学习并优化其行为。
 
-![AgenticSeeker Architecture](https://raw.githubusercontent.com/e-cloud-cup/mobius-e-cloud-cup-2024/main/assets/AgenticSeeker%20Architecture.png)
-
 ## 核心特性
 
 *   **多智能体协作**: 由指挥官、执行者、反思者、记录员等多个智能体协同工作，完成复杂任务。
@@ -113,20 +111,23 @@ graph TD
     J -- "记录知识" --> M
 ```
 
-## 环境准备
+## 系统要求
 
-在开始之前，请确保您的系统已安装以下软件：
+### 硬件要求
+- CPU: 4核心以上
+- 内存: 8GB以上（推荐16GB）
+- 存储: 10GB可用空间
+- Android设备: 支持ADB调试的Android 8.0+设备
 
-1.  **Conda**: 用于管理Python环境。
-    *   [Miniconda 安装指南](https://docs.conda.io/en/latest/miniconda.html)
-2.  **Android SDK Platform Tools (ADB)**: 用于连接和控制Android设备。
-    *   **macOS**: `brew install android-platform-tools`
-    *   **Ubuntu**: `sudo apt install android-tools-adb`
-3.  **Python 3.9+**
+### 软件要求
+- Python 3.9+
+- Conda (Anaconda/Miniconda)
+- ADB (Android Debug Bridge)
+- Git
 
-## 安装与配置
+## 环境准备与安装
 
-我们提供了一键式安装脚本来简化环境搭建过程。
+我们提供了一键式安装脚本和手动安装两种方式。
 
 ### 1. 自动安装 (推荐)
 
@@ -140,7 +141,7 @@ bash setup.sh
 *   检查 Conda, ADB, Python 环境。
 *   创建名为 `agenticseeker` 的 Conda 环境。
 *   激活环境并安装所有依赖。
-*   在开发模式下安装 `agenticx==0.2.1` 框架。
+*   在开发模式下安装 `agenticx` 框架。
 *   从 `.env.example` 创建 `.env` 配置文件。
 *   创建 `run.sh` 启动脚本。
 
@@ -151,39 +152,31 @@ bash setup.sh
 #### 第一步：克隆项目并创建环境
 
 ```bash
-# 假定您已克隆 AgenticX 仓库
-# git clone https://github.com/your-repo/AgenticX.git
-# cd AgenticX/examples/agenticx-for-ecloudcup/agenticx-for-ecloudcup/agenticseeker
+# 假定您已克隆仓库
+# git clone <repository_url>
+# cd AgenticSeeker
 
 # 创建并激活 Conda 环境
-conda create -n agenticseeker python=3.13 -y
+conda create -n agenticseeker python=3.9 -y
 conda activate agenticseeker
 ```
 
-#### 第二步：安装 AgenticX 框架
-
-AgenticSeeker 依赖于 `agenticx` 框架。您需要以**可编辑模式 (editable mode)** 安装它。脚本会自动找到仓库根目录进行安装。
+#### 第二步：安装依赖
 
 ```bash
-# 进入 AgenticX 仓库的根目录
-# cd /path/to/your/AgenticX/
-# pip install -e .
-# 确认版本为 0.2.1 或兼容版本
-pip show agenticx
-```
-
-#### 第三步：安装项目依赖
-
-```bash
-# 回到 agenticseeker 目录
-# cd examples/agenticx-for-ecloudcup/agenticx-for-ecloudcup/agenticseeker
-
 # 更新 pip 并安装依赖
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# 安装 AgenticX 框架 (如果尚未在其他地方安装)
+# cd /path/to/AgenticX
+# pip install -e .
+
+# 安装额外的移动设备控制工具
+pip install adbutils pure-python-adb
 ```
 
-#### 第四步：配置环境变量
+#### 第三步：配置环境变量
 
 复制环境变量模板文件，并根据您的实际情况填写 `LLM_PROVIDER` 和对应的 `API_KEY`。
 
@@ -194,38 +187,122 @@ nano .env  # 或者使用您喜欢的编辑器
 
 `.env` 文件内容示例:
 ```
-# LLM 配置
-LLM_PROVIDER="openai" # 支持 "openai", "deepseek", "kimi" 等
-OPENAI_API_KEY="sk-..."
-DEEPSEEK_API_KEY="sk-..."
-KIMI_API_KEY="..."
-# ... 其他配置
+# LLM配置（选择一个提供商）
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_CHAT_MODEL=gpt-4o-mini
+
+# 或者使用其他提供商
+# LLM_PROVIDER=deepseek
+# DEEPSEEK_API_KEY=your_deepseek_api_key_here
+
+# 应用配置
+DEBUG=true
+LOG_LEVEL=INFO
 ```
+
+#### 第四步：配置Android设备与ADB
+
+1.  **启用开发者选项**:
+    *   设置 → 关于手机 → 连续点击"版本号"7次
+
+2.  **启用USB调试**:
+    *   设置 → 开发者选项 → USB调试（开启）
+    *   设置 → 开发者选项 → USB安装（开启）
+
+3.  **连接设备**:
+    *   使用USB线连接设备到电脑
+    *   在设备上授权USB调试
+
+4.  **验证ADB连接**:
+    ```bash
+    # 检查ADB版本
+    adb version
+
+    # 启动ADB服务
+    adb start-server
+
+    # 检查连接的设备
+    adb devices
+    # 确保设备显示为"device"状态
+    ```
 
 ## 运行系统
 
-### 1. 连接设备
+### 1. 启动 AgenticSeeker
 
-确保您的Android设备已通过USB连接，并已开启“开发者选项”和“USB调试”功能。通过以下命令验证设备是否成功连接：
-
-```bash
-adb devices
-```
-您应该能看到类似 `List of devices attached` 和您的设备ID。
-
-### 2. 启动 AgenticSeeker
-
-使用 `run.sh` 脚本来启动系统。
+确保您的Android设备已成功连接。
 
 *   **交互模式**: 在此模式下，您可以与系统进行多轮对话，动态下达指令。
     ```bash
+    # 使用自动生成的脚本
     ./run.sh --interactive
+    
+    # 或者手动执行
+    python main.py --interactive
     ```
 
 *   **单任务模式**: 直接指定一个任务，系统执行完毕后会自动退出。
     ```bash
+    # 使用自动生成的脚本
     ./run.sh --task "在设置中将语言切换为英文"
+
+    # 或者手动执行
+    python main.py --task "帮我发微信给jennifer，说我今晚回家吃饭"
     ```
+
+### 2. 其他运行参数
+
+```bash
+# 从文件读取任务
+python main.py --task-file tasks.txt
+
+# 启用性能评估
+python main.py --task "打开设置" --evaluate
+
+# 使用自定义配置文件
+python main.py --config custom_config.yaml
+
+# 设置日志级别
+python main.py --log-level DEBUG
+```
+
+## 使用示例
+
+### 示例1: 发送微信消息
+
+```
+"帮我发微信给jennifer，说我今晚回家吃饭"
+```
+**系统执行流程**:
+1.  **Manager**分析任务：打开微信 → 找到联系人 → 发送消息
+2.  **Executor**执行操作：点击微信图标 → 搜索jennifer → 输入消息 → 发送
+3.  **ActionReflector**验证：确认消息发送成功
+4.  **Notetaker**记录：保存操作经验和知识
+
+### 示例2: 设置闹钟
+
+```
+"设置明天早上8点的闹钟，备注是开会"
+```
+**执行流程**:
+1.  打开时钟应用
+2.  创建新闹钟
+3.  设置时间为8:00
+4.  添加备注"开会"
+5.  保存闹钟
+
+### 示例3: 复杂应用操作
+
+```
+"打开抖音，搜索美食相关视频，点赞前3个视频"
+```
+**执行流程**:
+1.  启动抖音应用
+2.  点击搜索按钮
+3.  输入"美食"关键词
+4.  浏览搜索结果
+5.  依次点赞前3个视频
 
 ## Docker 部署
 
@@ -248,8 +325,88 @@ adb devices
     ```bash
     docker-compose up --build
     ```
+    **注意**: 可能需要配置USB设备访问权限，例如在 `docker run` 时添加 `--privileged -v /dev/bus/usb:/dev/bus/usb`。
 
 更多详细信息，请参考 `docker/README.md`。
+
+## 故障排除
+
+### 常见问题
+
+1.  **ADB连接失败**:
+    ```bash
+    # 重启ADB服务
+    adb kill-server
+    adb start-server
+   
+    # 检查设备授权
+    adb devices
+    ```
+
+2.  **依赖安装失败**:
+    ```bash
+    # 确保在正确的conda环境中
+    conda activate agenticseeker
+    
+    # 更新pip并清理缓存
+    pip install --upgrade pip
+    pip cache purge
+   
+    # 重新安装
+    pip install -r requirements.txt --force-reinstall
+    ```
+
+3.  **LLM API调用失败**:
+    *   检查 `.env` 文件中的API密钥是否正确。
+    *   验证网络连接是否可以访问API服务。
+    *   确认API账户有足够配额。
+
+4.  **设备操作失败**:
+    *   确认设备屏幕已解锁。
+    *   检查目标应用是否已安装。
+    *   验证开发者选项中的 "USB调试" 和 "USB安装" 是否开启。
+
+### 日志调试
+
+```bash
+# 启用详细日志运行
+python main.py --log-level DEBUG
+
+# 查看日志文件 (如果配置了文件日志)
+# tail -f logs/agenticseeker.log
+```
+
+## 性能优化
+
+1.  **内存优化**: 调整批处理大小、启用模型缓存、定期清理历史数据。
+2.  **速度优化**: 使用本地或更快的LLM模型、启用操作缓存、优化图像处理分辨率。
+3.  **准确性优化**: 调整LLM温度参数、增加操作间的验证步骤、完善错误处理逻辑。
+
+## 扩展开发
+
+### 添加新的操作工具
+
+```python
+# 在 tools/ 目录下创建新工具文件
+from agenticx.tools.base import BaseTool
+
+class CustomTool(BaseTool):
+    def _run(self, **kwargs):
+        # 实现工具逻辑
+        pass
+```
+
+### 自定义智能体
+
+```python
+# 继承基础智能体类
+from core.base_agent import BaseAgenticSeekerAgent
+
+class CustomAgent(BaseAgenticSeekerAgent):
+    async def process_task(self, task):
+        # 实现自定义逻辑
+        pass
+```
 
 ## 开发与测试
 
@@ -267,3 +424,12 @@ adb devices
     pre-commit install
     pre-commit run --all-files
     ```
+
+## 支持与反馈
+
+- 项目地址: `https://github.com/DemonDamon/AgenticSeeker` (请替换为实际地址)
+- 问题反馈: 在 GitHub 上创建 Issue
+
+---
+
+**注意**: 请确保在使用前已正确配置所有环境变量和设备连接。首次运行建议使用简单任务进行测试。
