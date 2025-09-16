@@ -1,0 +1,604 @@
+# AgenticSeeker 移动GUI智能体系统配置文件
+# 基于AgenticX框架的配置文件
+# Version: 1.0.0 (AgenticX集成版本)
+
+# AgenticX框架配置
+agenticx:
+  # 事件系统配置
+  event_bus:
+    enabled: true
+    max_history: 1000
+    event_persistence: false
+  
+  # 组件系统配置
+  components:
+    auto_initialize: true
+    lifecycle_management: true
+    dependency_injection: true
+  
+  # 工具系统配置
+  tools:
+    timeout_default: 30.0
+    retry_count: 3
+    validation_enabled: true
+    monitoring_enabled: true
+  
+  # 内存系统配置
+  memory:
+    provider: "agenticx"  # agenticx
+    max_entries: 10000
+    ttl: 3600
+    embedding_model: "${BAILIAN_EMBEDDING_MODEL}"  # 使用阿里云多模态 embedding 模型
+  
+  # 平台配置
+  platform:
+    name: "AgenticSeeker"
+    version: "2.0.0"
+    environment: "development"  # development, production
+
+# LLM配置
+llm:
+  provider: bailian
+  model: ${BAILIAN_CHAT_MODEL}
+  api_key: ${BAILIAN_API_KEY}
+  base_url: ${BAILIAN_API_BASE}  # 支持代理设置
+  temperature: 0.3  # 降低温度以提高GUI操作的准确性
+  max_tokens: 128k
+  timeout: 60
+
+# 知识管理配置
+knowledge:
+  storage_type: "milvus"  # milvus, postgres, memory
+  
+  # 数据库连接配置
+  database:
+    milvus:
+      host: "localhost"
+      port: 19530
+      collection_name: "knowledge_vectors"
+      alias: "default"
+      user: ""
+      password: "password"
+      secure: false
+      timeout: 30.0
+      dimension: 1536
+      metric_type: "COSINE"  # COSINE, L2, IP
+      index_type: "IVF_FLAT"  # IVF_FLAT, IVF_SQ8, HNSW
+      nlist: 1024
+    
+    postgres:
+      host: "localhost"
+      port: 5432
+      database: "agenticx"
+      username: "postgres"
+      password: "password"
+      schema: "public"
+      min_connections: 1
+      max_connections: 20
+      connection_timeout: 30.0
+      command_timeout: 60.0
+      ssl_mode: "prefer"
+    
+    redis:
+      host: "localhost"
+      port: 6379
+      database: 0
+      password: "password"
+      username: null
+      max_connections: 50
+      connection_timeout: 5.0
+      socket_timeout: 5.0
+      socket_keepalive: true
+      retry_on_timeout: true
+      ssl: false
+    
+    minio:
+      endpoint: "localhost:9000"
+      access_key: "minioadmin"
+      secret_key: "minioadmin"
+      bucket_name: "agenticseeker"
+      secure: false
+      region: "us-east-1"
+      part_size: 67108864  # 64MB
+      max_parts: 10000
+  
+  # 向量化配置
+  vectorization:
+    enabled: true
+    embedding_model: "${BAILIAN_EMBEDDING_MODEL}"
+    dimension: 1536
+    batch_size: 100
+    max_tokens: 8192
+    image_embedding_model: "clip-vit-base-patch32"
+    image_dimension: 512
+    cache_embeddings: true
+    cache_ttl: 3600  # 1小时
+  
+  # 连接管理配置
+  connection_retry_times: 3
+  connection_retry_delay: 1.0
+  health_check_interval: 30
+
+# Embedding服务配置 (基于AgenticX Embeddings)
+embedding:
+  # 使用AgenticX的embedding系统
+  provider: "bailian"  # openai, bailian, siliconflow, litellm
+  
+  # 百炼embedding配置
+  bailian:
+    api_key: "${BAILIAN_API_KEY}"
+    model: "text-embedding-v4"  # 阿里云百炼最新embedding模型，支持维度参数
+    api_url: "${BAILIAN_API_BASE}"
+    dimension: 1536
+    max_tokens: 8192
+    batch_size: 100
+    timeout: 30
+    retry_count: 3
+    retry_delay: 1.0
+  
+  # OpenAI embedding配置 (备用)
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+    model: "text-embedding-ada-002"
+    api_base: "${OPENAI_API_BASE}"
+    dimension: 1536
+    max_tokens: 8192
+    batch_size: 100
+    timeout: 30
+  
+  # SiliconFlow embedding配置 (备用)
+  siliconflow:
+    api_key: "${SILICONFLOW_API_KEY}"
+    model: "BAAI/bge-large-zh-v1.5"
+    api_base: "https://api.siliconflow.cn/v1"
+    dimension: 1024
+    max_tokens: 512
+    batch_size: 50
+  
+  # 多模态embedding配置
+  multimodal:
+    enabled: true  # 启用混合embedding模式
+    text_model: "multimodal-embedding-v1"  # 统一使用多模态embedding模型
+    multimodal_model: "multimodal-embedding-v1"  # 使用多模态embedding模型
+    unified_dimension: 1536
+    cross_modal_alignment: true
+    image_preprocessing: true
+    text_preprocessing: true
+    batch_size: 10  # 多模态批次大小
+    
+    # 智能选择策略
+    auto_detect_content: true
+    prefer_multimodal_for_gui: true
+    text_only_threshold: 0.8
+    
+    # 成本控制
+    cost_threshold_multimodal: 0.5
+    max_cost_per_request: 1.0
+  
+  # 缓存配置
+  cache:
+    enabled: true
+    ttl: 3600  # 1小时
+    max_entries: 10000
+    storage: "redis"  # memory, redis, file
+    compression: true
+    cache_key_prefix: "embedding:"
+  
+  # 性能配置
+  performance:
+    async_processing: true
+    connection_pool_size: 10
+    request_timeout: 30
+    max_retries: 3
+    retry_backoff: "exponential"  # linear, exponential
+    rate_limiting: true
+    max_requests_per_minute: 1000
+  
+  # 降级策略配置
+  fallback:
+    enabled: true
+    providers: ["bailian", "openai", "siliconflow"]
+    auto_switch: true
+    health_check_interval: 60
+    failure_threshold: 3
+
+# AgenticSeeker 智能体配置 (基于AgenticX Agent)
+agents:
+  - id: manager_agent
+    name: Manager智能体
+    role: 任务管理器
+    goal: 分析用户任务，制定执行计划，协调其他智能体完成移动GUI任务
+    backstory: 我是AgenticSeeker系统的核心管理者，负责理解用户意图，分解复杂任务，并协调团队完成移动应用操作
+    # 基于AgenticX工具系统的工具配置
+    tools: 
+      - "agenticseeker.tools.ClickTool"
+      - "agenticseeker.tools.SwipeTool"
+      - "agenticseeker.tools.ScreenshotTool"
+      - "agenticx.tools.builtin.TaskDecompositionTool"
+    # AgenticX Agent配置
+    agent_config:
+      max_iterations: 10
+      memory_enabled: true
+      event_driven: true
+      component_based: true
+    learning_enabled: true
+  
+  - id: executor_agent
+    name: Executor智能体
+    role: 动作执行器
+    goal: 执行具体的移动GUI操作，包括点击、滑动、输入等原子动作
+    backstory: 我是专业的移动设备操作执行者，精通各种GUI交互操作，能够准确执行各种移动应用操作指令
+    # 基于AgenticX工具系统的GUI工具
+    tools:
+      - "agenticseeker.tools.ClickTool"
+      - "agenticseeker.tools.SwipeTool"
+      - "agenticseeker.tools.TextInputTool"
+      - "agenticseeker.tools.KeyPressTool"
+      - "agenticseeker.tools.ScreenshotTool"
+      - "agenticseeker.tools.SmartClickTool"
+      - "agenticseeker.tools.SmartScrollTool"
+    agent_config:
+      max_iterations: 15
+      memory_enabled: true
+      event_driven: true
+      component_based: true
+    learning_enabled: true
+  
+  - id: actionreflector_agent
+    name: ActionReflector智能体
+    role: 动作反思器
+    goal: 分析执行结果，评估动作效果，提供优化建议和错误恢复策略
+    backstory: 我是智能的动作分析师，能够深入分析每个操作的效果，识别问题并提供改进建议
+    tools:
+      - "agenticseeker.tools.ScreenshotTool"
+      - "agenticseeker.tools.ImageComparisonTool"
+      - "agenticseeker.tools.OCRTool"
+      - "agenticseeker.evaluation.PerformanceEvaluator"
+    agent_config:
+      max_iterations: 8
+      memory_enabled: true
+      event_driven: true
+      component_based: true
+    learning_enabled: true
+  
+  - id: notetaker_agent
+    name: Notetaker智能体
+    role: 知识记录器
+    goal: 记录操作过程，维护知识库，支持经验积累和知识共享
+    backstory: 我是团队的知识管理专家，负责记录所有操作经验，构建知识库，支持团队学习和改进
+    tools:
+      - "agenticseeker.knowledge.KnowledgeManager"
+      - "agenticseeker.knowledge.KnowledgePool"
+      - "agenticx.memory.component.Memory"
+    agent_config:
+      max_iterations: 5
+      memory_enabled: true
+      event_driven: true
+      component_based: true
+    learning_enabled: true
+
+# AgenticSeeker 工作流配置 (基于AgenticX Workflow)
+workflows:
+  - id: agenticseeker_workflow
+    name: AgenticSeeker移动GUI任务执行工作流
+    # AgenticX工作流引擎配置
+    workflow_config:
+      engine: "agenticx.core.workflow_engine.WorkflowEngine"
+      execution_mode: "sequential"  # sequential, parallel, conditional
+      event_driven: true
+      state_management: true
+      error_handling: "retry_with_fallback"
+      max_retries: 3
+    
+    nodes:
+      - id: manager
+        type: agent
+        agent_id: manager_agent
+        # AgenticX节点配置
+        node_config:
+          timeout: 60
+          memory_enabled: true
+          event_publishing: true
+      - id: executor
+        type: agent
+        agent_id: executor_agent
+        node_config:
+          timeout: 120
+          memory_enabled: true
+          event_publishing: true
+          tool_validation: true
+      - id: actionreflector
+        type: agent
+        agent_id: actionreflector_agent
+        node_config:
+          timeout: 45
+          memory_enabled: true
+          event_publishing: true
+      - id: notetaker
+        type: agent
+        agent_id: notetaker_agent
+        node_config:
+          timeout: 30
+          memory_enabled: true
+          event_publishing: true
+          knowledge_persistence: true
+    
+    edges:
+      - from: manager
+        to: executor
+        condition: "task_decomposed"
+        # AgenticX边配置
+        edge_config:
+          event_trigger: "task_planning_completed"
+          data_flow: true
+          validation: true
+      - from: executor
+        to: actionreflector
+        condition: "action_executed"
+        edge_config:
+          event_trigger: "gui_action_completed"
+          data_flow: true
+          result_validation: true
+      - from: actionreflector
+        to: notetaker
+        condition: "reflection_completed"
+        edge_config:
+          event_trigger: "action_analysis_completed"
+          data_flow: true
+          knowledge_extraction: true
+      - from: notetaker
+        to: manager
+        condition: "knowledge_recorded"
+        edge_config:
+          event_trigger: "knowledge_stored"
+          data_flow: true
+          loop_control: true
+
+# InfoPool 信息共享配置 (基于AgenticX Component)
+info_pool:
+  enabled: true
+  # AgenticX组件配置
+  component_config:
+    base_class: "agenticx.core.component.Component"
+    event_bus_integration: true
+    lifecycle_management: true
+    auto_initialize: true
+  
+  # 存储配置
+  storage:
+    type: "memory"  # memory, redis, database
+    max_entries: 10000
+    ttl: 3600  # 秒
+    sync_interval: 5  # 秒
+    persistence: false
+  
+  # 事件配置
+  events:
+    publish_info_added: true
+    publish_info_updated: true
+    publish_info_removed: true
+    publish_cleanup_events: true
+    event_history: true
+  
+  # 性能配置
+  performance:
+    batch_operations: true
+    async_processing: true
+    cache_enabled: true
+    compression: false
+
+# 五阶段学习引擎配置 (基于AgenticX Learning)
+learning:
+  enabled: true
+  
+  # AgenticX学习系统集成
+  agenticx_integration:
+    memory_component: "agenticx.memory.component.Memory"
+    embodiment_learning: "agenticx.embodiment.learning.gui_explorer.GUIExplorer"
+    knowledge_base: "agenticx.memory.knowledge_base.KnowledgeBase"
+    event_driven_learning: true
+  
+  stages:
+    prior_knowledge:
+      enabled: true
+      knowledge_base_path: "./knowledge/prior"
+      # AgenticX知识库集成
+      agenticx_config:
+        use_agenticx_memory: true
+        embedding_model: "${BAILIAN_EMBEDDING_MODEL}"  # 使用阿里云多模态 embedding 模型
+        vector_store: "faiss"
+        knowledge_extraction: true
+    
+    guided_exploration:
+      enabled: true
+      exploration_strategy: "epsilon_greedy"
+      epsilon: 0.1
+      # AgenticX具身智能集成
+      embodiment_config:
+        gui_explorer_enabled: true
+        action_space_learning: true
+        visual_understanding: true
+        interaction_patterns: true
+    
+    task_synthesis:
+      enabled: true
+      synthesis_method: "hierarchical"
+      # AgenticX任务系统集成
+      task_config:
+        task_decomposition: true
+        workflow_generation: true
+        pattern_recognition: true
+        adaptive_planning: true
+    
+    usage_optimization:
+      enabled: true
+      optimization_algorithm: "reinforcement_learning"
+      # AgenticX优化系统
+      optimization_config:
+        performance_tracking: true
+        adaptive_parameters: true
+        success_rate_optimization: true
+        resource_efficiency: true
+    
+    edge_case_handling:
+      enabled: true
+      detection_threshold: 0.8
+      # AgenticX异常处理
+      edge_case_config:
+        anomaly_detection: true
+        recovery_strategies: true
+        fallback_mechanisms: true
+        learning_from_failures: true
+
+# 移动设备配置 (基于AgenticX Tools)
+mobile:
+  platform: "android"  # android, ios, desktop
+  device_id: "2TV9K24412026935"  # 真机设备ID
+  
+  # AgenticX工具适配器配置
+  adapter_config:
+    factory: "agenticseeker.tools.tool_adapters.AdapterFactory"
+    android_adapter: "agenticseeker.tools.tool_adapters.AndroidAdapter"
+    ios_adapter: "agenticseeker.tools.tool_adapters.iOSAdapter"
+    desktop_adapter: "agenticseeker.tools.tool_adapters.DesktopAdapter"
+    auto_detection: true
+    initialization_timeout: 30
+  
+  # 连接配置
+  connection:
+    appium_server: "http://localhost:4723"
+    connection_timeout: 30
+    command_timeout: 60
+    retry_attempts: 3
+  
+  # 操作配置
+  operations:
+    screenshot_dir: "./screenshots"
+    max_wait_time: 30
+    implicit_wait: 10
+    element_wait_timeout: 20
+    action_delay: 0.5
+  
+  # AgenticX工具管理器集成
+  tool_manager:
+    enabled: true
+    manager_class: "agenticseeker.tools.gui_tools.GUIToolManager"
+    event_bus_integration: true
+    monitoring_enabled: true
+    caching_enabled: true
+    max_concurrent_tools: 5
+
+# 监控配置 (基于AgenticX Observability)
+monitoring:
+  enabled: true
+  
+  # AgenticX可观测性集成
+  agenticx_observability:
+    enabled: true
+    tracing: true
+    metrics_collection: true
+    event_monitoring: true
+    performance_profiling: true
+  
+  # 指标配置
+  metrics:
+    # 执行指标
+    execution:
+      - execution_time
+      - success_rate
+      - error_rate
+      - retry_count
+    # 智能体指标
+    agents:
+      - agent_performance
+      - task_completion_rate
+      - decision_accuracy
+      - collaboration_efficiency
+    # GUI操作指标
+    gui_operations:
+      - operation_accuracy
+      - element_detection_rate
+      - action_success_rate
+      - screenshot_quality
+    # 学习指标
+    learning:
+      - learning_progress
+      - knowledge_accumulation
+      - adaptation_rate
+      - pattern_recognition
+    # 资源指标
+    resources:
+      - token_usage
+      - memory_usage
+      - cpu_usage
+      - network_latency
+  
+  # 日志配置
+  logging:
+    log_level: "INFO"
+    log_file: "./logs/agenticseeker.log"
+    structured_logging: true
+    log_rotation: true
+    max_file_size: "100MB"
+    backup_count: 5
+  
+  # 告警配置
+  alerts:
+    enabled: true
+    error_threshold: 0.1
+    performance_threshold: 30.0
+    notification_channels: ["console", "file"]
+
+# 评估系统配置 (基于AgenticX Evaluation)
+evaluation:
+  enabled: true
+  
+  # AgenticX评估框架集成
+  agenticx_evaluation:
+    framework: "agenticseeker.evaluation.framework.EvaluationFramework"
+    test_environment: "agenticseeker.evaluation.test_environment.TestEnvironment"
+    performance_evaluator: "agenticseeker.evaluation.performance_evaluator.PerformanceEvaluator"
+    benchmark_runner: "agenticseeker.evaluation.benchmark_runner.BenchmarkRunner"
+  
+  # 基准测试配置
+  benchmarks:
+    suite: "mobile_agent_v3"
+    custom_benchmarks: ["gui_interaction", "task_completion", "learning_efficiency"]
+    parallel_execution: true
+    timeout_per_test: 300
+  
+  # 评估指标
+  metrics:
+    # 任务完成指标
+    task_completion:
+      - completion_rate
+      - completion_time
+      - task_accuracy
+      - error_recovery_rate
+    # 操作准确性指标
+    operation_accuracy:
+      - click_accuracy
+      - swipe_accuracy
+      - input_accuracy
+      - navigation_accuracy
+    # 学习效率指标
+    learning_efficiency:
+      - adaptation_speed
+      - knowledge_retention
+      - transfer_learning
+      - improvement_rate
+    # 系统性能指标
+    system_performance:
+      - response_time
+      - throughput
+      - resource_efficiency
+      - scalability
+  
+  # 报告配置
+  reporting:
+    enabled: true
+    report_interval: 100  # 每100个任务生成一次报告
+    report_format: ["json", "html", "csv"]
+    report_dir: "./reports"
+    include_visualizations: true
+    auto_upload: false

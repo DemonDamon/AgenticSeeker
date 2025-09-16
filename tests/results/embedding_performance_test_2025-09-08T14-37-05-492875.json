@@ -1,0 +1,292 @@
+{
+  "test_timestamp": "2025-09-08T14:35:47.727535",
+  "test_environment": {
+    "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+    "embedding_config": {
+      "provider": "bailian",
+      "bailian": {
+        "api_key": "sk-b62d64f8c5414307950538a8f2aa6f2b",
+        "model": "text-embedding-v4",
+        "api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "dimension": 1536,
+        "max_tokens": 8192,
+        "batch_size": 100,
+        "timeout": 30,
+        "retry_count": 3,
+        "retry_delay": 1.0
+      },
+      "openai": {
+        "api_key": "sk-2ErOT2SXfrVE3k82LxDRS6a6ErOBtJM35rbH2XQw1hMKU7Zz",
+        "model": "text-embedding-ada-002",
+        "api_base": "http://47.251.106.113:3010/v1",
+        "dimension": 1536,
+        "max_tokens": 8192,
+        "batch_size": 100,
+        "timeout": 30
+      },
+      "siliconflow": {
+        "api_key": "",
+        "model": "BAAI/bge-large-zh-v1.5",
+        "api_base": "https://api.siliconflow.cn/v1",
+        "dimension": 1024,
+        "max_tokens": 512,
+        "batch_size": 50
+      },
+      "multimodal": {
+        "enabled": true,
+        "text_model": "multimodal-embedding-v1",
+        "multimodal_model": "multimodal-embedding-v1",
+        "unified_dimension": 1536,
+        "cross_modal_alignment": true,
+        "image_preprocessing": true,
+        "text_preprocessing": true,
+        "batch_size": 10,
+        "auto_detect_content": true,
+        "prefer_multimodal_for_gui": true,
+        "text_only_threshold": 0.8,
+        "cost_threshold_multimodal": 0.5,
+        "max_cost_per_request": 1.0
+      },
+      "cache": {
+        "enabled": true,
+        "ttl": 3600,
+        "max_entries": 10000,
+        "storage": "redis",
+        "compression": true,
+        "cache_key_prefix": "embedding:"
+      },
+      "performance": {
+        "async_processing": true,
+        "connection_pool_size": 10,
+        "request_timeout": 30,
+        "max_retries": 3,
+        "retry_backoff": "exponential",
+        "rate_limiting": true,
+        "max_requests_per_minute": 1000
+      },
+      "fallback": {
+        "enabled": true,
+        "providers": [
+          "bailian",
+          "openai",
+          "siliconflow"
+        ],
+        "auto_switch": true,
+        "health_check_interval": 60,
+        "failure_threshold": 3
+      }
+    }
+  },
+  "text_embedding": {
+    "test_type": "text_embedding",
+    "total_cases": 4,
+    "results": [
+      {
+        "test_case": "text_1",
+        "content_length": 7,
+        "embedding_type": "text",
+        "processing_time": 0.5103509426116943,
+        "cache_hit": false,
+        "cost_estimate": 1.7500000000000002e-07,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "text_2",
+        "content_length": 40,
+        "embedding_type": "text",
+        "processing_time": 0.2027881145477295,
+        "cache_hit": false,
+        "cost_estimate": 1.0000000000000002e-06,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "text_3",
+        "content_length": 37,
+        "embedding_type": "text",
+        "processing_time": 0.22104382514953613,
+        "cache_hit": false,
+        "cost_estimate": 9.25e-07,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "text_4",
+        "content_length": 41,
+        "embedding_type": "text",
+        "processing_time": 0.22564911842346191,
+        "cache_hit": false,
+        "cost_estimate": 1.0250000000000001e-06,
+        "embedding_dimension": 1536,
+        "success": true
+      }
+    ],
+    "avg_processing_time": 0.28995800018310547,
+    "cache_hit_rate": 0.0
+  },
+  "multimodal_embedding": {
+    "test_type": "multimodal_embedding",
+    "total_cases": 4,
+    "results": [
+      {
+        "test_case": "multimodal_1",
+        "content_items": 1,
+        "embedding_type": "text",
+        "processing_time": 0.2525138854980469,
+        "cache_hit": false,
+        "cost_estimate": 2.5000000000000002e-08,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "multimodal_2",
+        "content_items": 2,
+        "embedding_type": "text",
+        "processing_time": 20.06242084503174,
+        "cache_hit": false,
+        "cost_estimate": 5.0000000000000004e-08,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "multimodal_3",
+        "content_items": 4,
+        "embedding_type": "text",
+        "processing_time": 1.4493472576141357,
+        "cache_hit": false,
+        "cost_estimate": 1.0000000000000001e-07,
+        "embedding_dimension": 1536,
+        "success": true
+      },
+      {
+        "test_case": "multimodal_4",
+        "content_items": 4,
+        "embedding_type": "text",
+        "processing_time": 1.5502352714538574,
+        "cache_hit": false,
+        "cost_estimate": 1.0000000000000001e-07,
+        "embedding_dimension": 1536,
+        "success": true
+      }
+    ],
+    "avg_processing_time": 5.828629314899445,
+    "text_routing_rate": 1.0,
+    "multimodal_routing_rate": 0.0
+  },
+  "cache_performance": {
+    "test_type": "cache_performance",
+    "first_request": {
+      "time": 0.24146294593811035,
+      "cache_hit": false
+    },
+    "second_request": {
+      "time": 2.7179718017578125e-05,
+      "cache_hit": true
+    },
+    "speedup_ratio": 8883.938596491229,
+    "batch_avg_time": 1.1348724365234375e-05,
+    "cache_stats": {
+      "hits": 11,
+      "misses": 9,
+      "evictions": 0,
+      "total_requests": 20,
+      "hit_rate": 0.55,
+      "text_cache_size": 6,
+      "multimodal_cache_size": 0,
+      "total_cache_size": 6
+    }
+  },
+  "cost_optimization": {
+    "test_type": "cost_optimization",
+    "results": [
+      {
+        "strategy": "strategy_1",
+        "embedding_type": "text",
+        "processing_time": 22.376217126846313,
+        "cost_estimate": 5.0000000000000004e-08,
+        "threshold": 0.1
+      },
+      {
+        "strategy": "strategy_2",
+        "embedding_type": "text",
+        "processing_time": 17.65416121482849,
+        "cost_estimate": 5.0000000000000004e-08,
+        "threshold": 1.0
+      }
+    ],
+    "cost_difference": 0.0
+  },
+  "batch_processing": {
+    "test_type": "batch_processing",
+    "results": [
+      {
+        "batch_size": 1,
+        "processing_time": 0.3004748821258545,
+        "avg_time_per_item": 0.3004748821258545,
+        "success_rate": 1.0,
+        "throughput": 3.3280652044025034
+      },
+      {
+        "batch_size": 5,
+        "processing_time": 1.0160329341888428,
+        "avg_time_per_item": 0.20320658683776854,
+        "success_rate": 1.0,
+        "throughput": 4.921100322394358
+      },
+      {
+        "batch_size": 10,
+        "processing_time": 1.1019341945648193,
+        "avg_time_per_item": 0.11019341945648194,
+        "success_rate": 1.0,
+        "throughput": 9.074952070027415
+      },
+      {
+        "batch_size": 20,
+        "processing_time": 1.0005028247833252,
+        "avg_time_per_item": 0.05002514123916626,
+        "success_rate": 1.0,
+        "throughput": 19.989948558447416
+      },
+      {
+        "batch_size": 50,
+        "processing_time": 9.596791982650757,
+        "avg_time_per_item": 0.19193583965301514,
+        "success_rate": 1.0,
+        "throughput": 5.210074375936339
+      }
+    ],
+    "optimal_batch_size": 20
+  },
+  "final_stats": {
+    "total_requests": 108,
+    "text_requests": 56,
+    "multimodal_requests": 0,
+    "cache_hits": 47,
+    "fallback_count": 5,
+    "total_cost": 2.3349999999999985e-05,
+    "avg_processing_time": 0.5831145169147705,
+    "cache_stats": {
+      "hits": 47,
+      "misses": 61,
+      "evictions": 0,
+      "total_requests": 108,
+      "hit_rate": 0.4351851851851852,
+      "text_cache_size": 56,
+      "multimodal_cache_size": 0,
+      "total_cache_size": 56
+    },
+    "hit_rate": 0.4351851851851852,
+    "cost_per_request": 2.1620370370370357e-07
+  },
+  "performance_summary": {
+    "overall_performance": "excellent",
+    "recommendations": [],
+    "key_metrics": {
+      "text_avg_time": 0.28995800018310547,
+      "cache_speedup": 8883.938596491229,
+      "optimal_batch_size": 20,
+      "cost_optimization_potential": 0.0
+    }
+  }
+}
