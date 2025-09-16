@@ -208,4 +208,5 @@ __marimo__/
 logs/
 screenshots/
 test_results/
-evaluation_results/docker/data/
+evaluation_results/
+docker/data/
